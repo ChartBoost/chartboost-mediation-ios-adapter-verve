@@ -21,9 +21,6 @@ class VerveAdapterAd: NSObject {
     
     /// The completion for the ongoing load operation.
     var loadCompletion: ((Result<PartnerEventDetails, Error>) -> Void)?
-
-    /// The completion for the ongoing show operation.
-    var showCompletion: ((Result<PartnerEventDetails, Error>) -> Void)?
     
     init(adapter: PartnerAdapter, request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) {
         self.adapter = adapter

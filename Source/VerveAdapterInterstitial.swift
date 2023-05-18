@@ -47,9 +47,9 @@ final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
             completion(.failure(error))
             return
         }
-        showCompletion = completion
-
         ad.show()
+        // There's no delegate method that notifies us of a show failure so assume success
+        completion(.success([:]))
     }
 }
 
@@ -76,8 +76,6 @@ extension VerveAdapterInterstitialAd: HyBidInterstitialAdDelegate
 
     func interstitialDidTrackImpression() {
         log(.didTrackImpression)
-        showCompletion?(.success([:])) ?? log(.showResultIgnored)
-        showCompletion = nil
         delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
