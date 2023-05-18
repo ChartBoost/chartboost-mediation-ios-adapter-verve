@@ -53,7 +53,7 @@ final class VerveAdapter: PartnerAdapter {
                 self.log(.setUpSucceded)
                 completion(nil)
             } else {
-                let error = ChartboostMediationError(code: .initializationFailureUnknown)
+                let error = self.error(.initializationFailureUnknown)
                 self.log(.setUpFailed(error))
                 completion(error)
             }

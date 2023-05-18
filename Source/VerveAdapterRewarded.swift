@@ -41,7 +41,7 @@ final class VerveAdapterRewardedAd: VerveAdapterAd, PartnerAd {
         log(.showStarted)
 
         guard ad?.isReady == true else {
-            let error = ChartboostMediationError(code: .showFailureAdNotReady)
+            let error = error(.showFailureAdNotReady)
             log(.loadFailed(error))
             completion(.failure(error))
             return
