@@ -75,10 +75,12 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
     }
 
     func adViewDidTrackClick(_ adView: HyBidAdView!) {
+        log(.didClick(error: nil))
         delegate?.didClick(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
     func adViewDidTrackImpression(_ adView: HyBidAdView!) {
+        log(.didTrackImpression)
         delegate?.didTrackImpression(self, details: [:])  ?? log(.delegateUnavailable)
     }
 }
