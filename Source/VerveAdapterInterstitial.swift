@@ -40,15 +40,15 @@ final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
     func show(with viewController: UIViewController, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         log(.showStarted)
 
-        guard ad?.isReady == true else {
+        guard let ad = ad, ad.isReady == true else {
             let error = error(.showFailureAdNotReady)
-            log(.loadFailed(error))
+            log(.showFailed(error))
             completion(.failure(error))
             return
         }
         showCompletion = completion
 
-        ad?.show()
+        ad.show()
     }
 }
 
