@@ -85,14 +85,8 @@ final class VerveAdapter: PartnerAdapter {
     /// - parameter hasGivenConsent: A boolean indicating if the user has given consent.
     /// - parameter privacyString: An IAB-compliant string indicating the CCPA status.
     func setCCPA(hasGivenConsent: Bool, privacyString: String) {
-        var iabString: String?
-        if hasGivenConsent {
-            iabString = "1YY-"
-        } else {
-            iabString = "1YN-"
-        }
-        HyBidUserDataManager.sharedInstance().setIABUSPrivacyString(iabString)
-        log(.privacyUpdated(setting: "IABUSPrivacyString", value: iabString))
+        HyBidUserDataManager.sharedInstance().setIABUSPrivacyString(privacyString)
+        log(.privacyUpdated(setting: "IABUSPrivacyString", value: privacyString))
     }
     
     /// Indicates if the user is subject to COPPA or not.
