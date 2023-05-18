@@ -19,13 +19,17 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
     /// - parameter completion: Closure to be performed once the ad has been loaded.
     func load(with viewController: UIViewController?, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         log(.loadStarted)
-        self.loadCompletion = completion
 
         let size = getHyBidBannerAdSize(size: self.request.size)
-        let ad = HyBidAdView(size: size)
-        inlineView = ad
-
-        ad?.load(withZoneID: self.request.partnerPlacement, andWith: self)
+        if let ad = HyBidAdView(size: size) {
+            self.loadCompletion = completion
+            inlineView = ad
+            ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
+        } else {
+            let error = error(.loadFailureUnknown)
+            log(.loadFailed(error))
+            completion(.failure(error))
+        }
     }
     
     /// Shows a loaded ad.
