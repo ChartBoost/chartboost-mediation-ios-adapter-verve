@@ -110,9 +110,7 @@ final class VerveAdapter: PartnerAdapter {
             return VerveAdapterInterstitialAd(adapter: self, request: request, delegate: delegate)
         case .rewarded:
             return VerveAdapterRewardedAd(adapter: self, request: request, delegate: delegate)
-        case .rewardedInterstitial:
-            throw error(.loadFailureUnsupportedAdFormat)
-        @unknown default:
+        default:
             throw error(.loadFailureUnsupportedAdFormat)
         }
     }
