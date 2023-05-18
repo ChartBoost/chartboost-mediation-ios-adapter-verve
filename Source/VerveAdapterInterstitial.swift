@@ -62,6 +62,7 @@ extension VerveAdapterInterstitialAd: HyBidInterstitialAdDelegate
     }
 
     func interstitialDidFailWithError(_ error: Error!) {
+        let error = error ?? self.error(.loadFailureUnknown)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
