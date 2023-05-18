@@ -26,8 +26,9 @@ final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
         loadCompletion = completion
 
         // Create the ad and set this object as the delegate
-        ad = HyBidInterstitialAd(zoneID: request.partnerPlacement, andWith: self)
-        ad?.load()
+        let hyBidAd = HyBidInterstitialAd(zoneID: request.partnerPlacement, andWith: self)
+        ad = hyBidAd
+        hyBidAd.load()
 
         // Some adapters assume success and call the completion at this point, but HyBidInterstitialAdDelegate
         // has a interstitialDidLoad() method that will call it on load success
