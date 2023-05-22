@@ -50,6 +50,7 @@ final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
         ad.show()
         // There's no delegate method that notifies us of a show failure so assume success
         completion(.success([:]))
+        log(.showSucceeded)
     }
 }
 
