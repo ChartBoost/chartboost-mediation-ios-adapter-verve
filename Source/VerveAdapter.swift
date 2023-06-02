@@ -13,7 +13,7 @@ final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
     /// The version of the partner SDK.
-    let partnerSDKVersion = "2.17.0"
+    let partnerSDKVersion = HyBid.sdkVersion() ?? "Unknown"  // SDK returns an optional string
     
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
