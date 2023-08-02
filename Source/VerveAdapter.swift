@@ -13,7 +13,7 @@ final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
     /// Verve uses the app token as a bidding token
-    var appToken: String = ""
+    var appToken: String? = nil
 
     /// The version of the partner SDK.
     let partnerSDKVersion = HyBid.sdkVersion() ?? "Unknown"  // SDK returns an optional string
@@ -68,7 +68,7 @@ final class VerveAdapter: PartnerAdapter {
     /// - parameter request: Information about the ad load request.
     /// - parameter completion: Closure to be performed with the fetched info.
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
-        guard appToken != "" else {
+        guard let appToken else {
             let error = error(.prebidFailureInvalidArgument, description: "App token is empty")
             log(.fetchBidderInfoFailed(request, error: error))
             completion([:])
