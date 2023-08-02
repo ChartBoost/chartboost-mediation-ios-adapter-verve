@@ -71,7 +71,7 @@ final class VerveAdapter: PartnerAdapter {
         guard let appToken else {
             let error = error(.prebidFailureInvalidArgument, description: "App token is empty")
             log(.fetchBidderInfoFailed(request, error: error))
-            completion([:])
+            completion(nil)
             return
         }
         completion(["app_auth_token": appToken])
