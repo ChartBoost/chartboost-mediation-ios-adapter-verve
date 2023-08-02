@@ -4,7 +4,7 @@ Note the first digit of every adapter version corresponds to the major version o
 Adapters are compatible with any Chartboost Mediation SDK version within that major version.
 
 ### 4.2.18.1.0
-- Fix bidding ads.
+- Add support for bidding ads.
 - This version of the adapters has been certified with HyBid 2.18.1.
 
 ### 4.2.17.0.0
