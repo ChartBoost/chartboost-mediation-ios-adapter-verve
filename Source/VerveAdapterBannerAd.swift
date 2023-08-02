@@ -24,7 +24,13 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
         if let ad = HyBidAdView(size: size) {
             self.loadCompletion = completion
             inlineView = ad
-            ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
+            // Load differently depending on whether this is a bidding or non-programatic ad
+            if let adm = request.adm {
+                ad.delegate = self
+                ad.prepareCustomMarkup(from: adm)
+            } else {
+                ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
+            }
         } else {
             let error = error(.loadFailureUnknown)
             log(.loadFailed(error))

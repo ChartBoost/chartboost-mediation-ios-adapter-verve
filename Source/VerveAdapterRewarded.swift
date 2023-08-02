@@ -27,8 +27,14 @@ final class VerveAdapterRewardedAd: VerveAdapterAd, PartnerAd {
 
         // Create the ad and set this object as the delegate
         let hyBidAd = HyBidRewardedAd(zoneID: request.partnerPlacement, andWith: self)
+        // Save a refernce to it
         ad = hyBidAd
-        hyBidAd.load()
+        // Load differently depending on whether this is a bidding or non-programatic ad
+        if let adm = request.adm {
+            hyBidAd.prepareCustomMarkupFrom(adm)
+        } else {
+            hyBidAd.load()
+        }
 
         // Some adapters assume success and call the completion at this point, but HyBidRewardedAdDelegate
         // has a rewardedDidLoad() method that will call it on load success
