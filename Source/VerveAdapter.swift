@@ -74,7 +74,7 @@ final class VerveAdapter: PartnerAdapter {
             completion([:])
             return
         }
-        completion(["app_auth_token":appToken])
+        completion(["app_auth_token": appToken])
     }
     
     /// Indicates if GDPR applies or not and the user's GDPR consent status.
