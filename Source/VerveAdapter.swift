@@ -12,13 +12,16 @@ import UIKit
 final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
+    /// Verve uses the app token as a bidding token
+    var appToken: String? = nil
+
     /// The version of the partner SDK.
     let partnerSDKVersion = HyBid.sdkVersion() ?? "Unknown"  // SDK returns an optional string
     
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.2.17.0.0"
+    let adapterVersion = "4.2.18.1.0"
     
     /// The partner's unique identifier.
     let partnerIdentifier = "verve"
@@ -47,6 +50,7 @@ final class VerveAdapter: PartnerAdapter {
             completion(error)
             return
         }
+        self.appToken = appToken
 
         HyBid.initWithAppToken(appToken) { success in
             if success {
@@ -64,8 +68,13 @@ final class VerveAdapter: PartnerAdapter {
     /// - parameter request: Information about the ad load request.
     /// - parameter completion: Closure to be performed with the fetched info.
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
-        // Verve does not use a bidding token
-        completion(nil)
+        guard let appToken else {
+            let error = error(.prebidFailureInvalidArgument, description: "App token is empty")
+            log(.fetchBidderInfoFailed(request, error: error))
+            completion(nil)
+            return
+        }
+        completion(["app_auth_token": appToken])
     }
     
     /// Indicates if GDPR applies or not and the user's GDPR consent status.

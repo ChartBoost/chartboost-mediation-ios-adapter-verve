@@ -1,6 +1,6 @@
   Pod::Spec.new do |spec|
     spec.name        = 'ChartboostMediationAdapterVerve'
-    spec.version     = '4.2.17.0.0'
+    spec.version     = '4.2.18.1.0'
     spec.license     = { :type => 'MIT', :file => 'LICENSE.md' }
     spec.homepage    = 'https://github.com/ChartBoost/chartboost-mediation-ios-adapter-verve'
     spec.authors     = { 'Chartboost' => 'https://www.chartboost.com/' }
@@ -23,7 +23,7 @@
     spec.dependency 'ChartboostMediationSDK', '~> 4.0'
 
     # Partner network SDK and version that this adapter is certified to work with.
-    spec.dependency 'HyBid', '~> 2.17.0'
+    spec.dependency 'HyBid', '~> 2.18.1'
 
     # Indicates, that if use_frameworks! is specified, the pod should include a static library framework.
     spec.static_framework = true

@@ -27,8 +27,14 @@ final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
 
         // Create the ad and set this object as the delegate
         let hyBidAd = HyBidInterstitialAd(zoneID: request.partnerPlacement, andWith: self)
+        // Save a reference to it
         ad = hyBidAd
-        hyBidAd.load()
+        // Load differently depending on whether this is a bidding or non-programatic ad
+        if let adm = request.adm {
+            hyBidAd.prepareCustomMarkupFrom(adm)
+        } else {
+            hyBidAd.load()
+        }
 
         // Some adapters assume success and call the completion at this point, but HyBidInterstitialAdDelegate
         // has a interstitialDidLoad() method that will call it on load success
