@@ -27,7 +27,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
             // Load differently depending on whether this is a bidding or non-programatic ad
             if let adm = request.adm {
                 ad.delegate = self
-                ad.prepareCustomMarkup(from: adm)
+                ad.renderAdWithContent(adm, withDelegate: self)
             } else {
                 ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
             }
