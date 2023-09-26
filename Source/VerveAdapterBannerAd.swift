@@ -20,21 +20,27 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
     func load(with viewController: UIViewController?, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         log(.loadStarted)
 
-        let size = getHyBidBannerAdSize(size: self.request.size)
-        if let ad = HyBidAdView(size: size) {
-            self.loadCompletion = completion
-            inlineView = ad
-            // Load differently depending on whether this is a bidding or non-programatic ad
-            if let adm = request.adm {
-                ad.delegate = self
-                ad.renderAdWithContent(adm, withDelegate: self)
-            } else {
-                ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
-            }
-        } else {
+        // Fail if we cannot fit a fixed size banner in the requested size.
+        guard let (_, partnerSize) = fixedBannerSize(for: request.size ?? IABStandardAdSize) else {
+            let error = error(.loadFailureInvalidBannerSize)
+            log(.loadFailed(error))
+            return completion(.failure(error))
+        }
+
+        guard let ad = HyBidAdView(size: partnerSize) else {
             let error = error(.loadFailureUnknown)
             log(.loadFailed(error))
-            completion(.failure(error))
+            return completion(.failure(error))
+        }
+
+        self.loadCompletion = completion
+        inlineView = ad
+        // Load differently depending on whether this is a bidding or non-programatic ad
+        if let adm = request.adm {
+            ad.delegate = self
+            ad.renderAdWithContent(adm, withDelegate: self)
+        } else {
+            ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
         }
     }
     
@@ -45,31 +51,20 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
     func show(with viewController: UIViewController, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         // no-op
     }
-    
-    /// Map Chartboost Mediation's banner sizes to the Reference SDK's supported sizes.
-    /// - Parameter size: The Chartboost Mediation's banner size.
-    /// - Returns: The corresponding Verve banner size.
-    func getHyBidBannerAdSize(size: CGSize?) -> HyBidAdSize {
-        let height = size?.height ?? 50
-        
-        switch height {
-        case 50..<89:
-            return HyBidAdSize.size_320x50
-        case 90..<249:
-            return HyBidAdSize.size_728x90
-        case 250...:
-            return HyBidAdSize.size_300x250
-        default:
-            return HyBidAdSize.size_320x50
-        }
-    }
 }
 
 extension VerveAdapterBannerAd : HyBidAdViewDelegate {
     func adViewDidLoad(_ adView: HyBidAdView!) {
         log(.loadSucceeded)
         self.inlineView = adView
-        loadCompletion?(.success([:])) ?? log(.loadResultIgnored)
+
+        var partnerDetails: [String: String] = [:]
+        if let loadedSize = fixedBannerSize(for: request.size ?? IABStandardAdSize) {
+            partnerDetails["bannerWidth"] = "\(loadedSize.size.width)"
+            partnerDetails["bannerHeight"] = "\(loadedSize.size.height)"
+            partnerDetails["bannerType"] = "0" // Fixed banner
+        }
+        loadCompletion?(.success(partnerDetails)) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
@@ -88,5 +83,26 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
     func adViewDidTrackImpression(_ adView: HyBidAdView!) {
         log(.didTrackImpression)
         delegate?.didTrackImpression(self, details: [:])  ?? log(.delegateUnavailable)
+    }
+}
+
+// MARK: - Helpers
+extension VerveAdapterBannerAd {
+    private func fixedBannerSize(for requestedSize: CGSize) -> (size: CGSize, partnerSize: HyBidAdSize)? {
+        let sizes: [(size: CGSize, partnerSize: HyBidAdSize)] = [
+            (size: IABLeaderboardAdSize, partnerSize: .size_728x90),
+            (size: IABMediumAdSize, partnerSize: .size_300x250),
+            (size: IABStandardAdSize, partnerSize: .size_320x50)
+        ]
+        // Find the largest size that can fit in the requested size.
+        for (size, partnerSize) in sizes {
+            // If height is 0, the pub has requested an ad of any height, so only the width matters.
+            if requestedSize.width >= size.width &&
+                (size.height == 0 || requestedSize.height >= size.height) {
+                return (size, partnerSize)
+            }
+        }
+        // The requested size cannot fit any fixed size banners.
+        return nil
     }
 }
