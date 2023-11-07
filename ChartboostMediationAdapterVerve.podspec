@@ -10,6 +10,7 @@
     # Source
     spec.module_name  = 'ChartboostMediationAdapterVerve'
     spec.source       = { :git => 'https://github.com/ChartBoost/chartboost-mediation-ios-adapter-verve.git', :tag => spec.version }
+    spec.resource_bundles = { 'ChartboostMediationAdapterVerve' => ['PrivacyInfo.xcprivacy'] }
     spec.source_files = 'Source/**/*.{swift}'
 
     # Minimum supported versions
