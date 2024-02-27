@@ -12,9 +12,6 @@ import UIKit
 final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
-    /// Verve uses the app token as a bidding token
-    var appToken: String? = nil
-
     /// The version of the partner SDK.
     let partnerSDKVersion = HyBid.sdkVersion() ?? "Unknown"  // SDK returns an optional string
     
@@ -50,7 +47,6 @@ final class VerveAdapter: PartnerAdapter {
             completion(error)
             return
         }
-        self.appToken = appToken
 
         HyBid.initWithAppToken(appToken) { success in
             if success {
