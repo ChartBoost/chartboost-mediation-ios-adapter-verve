@@ -31,7 +31,7 @@ final class VerveAdapterRewardedAd: VerveAdapterAd, PartnerAd {
         ad = hyBidAd
         // Load differently depending on whether this is a bidding or non-programatic ad
         if let adm = request.adm {
-            hyBidAd.prepareCustomMarkupFrom(adm)
+            hyBidAd.prepareAdWithContent(adContent: adm)
         } else {
             hyBidAd.load()
         }

@@ -38,9 +38,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
         // Load differently depending on whether this is a bidding or non-programatic ad
         if let adm = request.adm {
             ad.delegate = self
-            // `HyBidDemoAppPlacementBanner` does not appear to be an actual "demo" placement.  It is a naming convension in
-            // the `HyBidMarkupPlacement` enumeration for whatever reason.
-            ad.prepareCustomMarkup(from: adm, with: HyBidDemoAppPlacementBanner)
+            ad.renderAd(withContent: adm, with: self)
         } else {
             ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
         }
