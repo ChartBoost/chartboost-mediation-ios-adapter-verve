@@ -1,4 +1,4 @@
-// Copyright 2023-2023 Chartboost, Inc.
+// Copyright 2023-2024 Chartboost, Inc.
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file.
@@ -38,7 +38,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
         // Load differently depending on whether this is a bidding or non-programatic ad
         if let adm = request.adm {
             ad.delegate = self
-            ad.prepareCustomMarkup(from: adm)
+            ad.renderAd(withContent: adm, with: self)
         } else {
             ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
         }

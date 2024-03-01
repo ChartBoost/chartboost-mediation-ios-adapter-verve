@@ -1,4 +1,4 @@
-// Copyright 2023-2023 Chartboost, Inc.
+// Copyright 2023-2024 Chartboost, Inc.
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file.
@@ -12,16 +12,13 @@ import UIKit
 final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
-    /// Verve uses the app token as a bidding token
-    var appToken: String? = nil
-
     /// The version of the partner SDK.
     let partnerSDKVersion = HyBid.sdkVersion() ?? "Unknown"  // SDK returns an optional string
     
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.2.18.1.1"
+    let adapterVersion = "4.2.20.0.0"
     
     /// The partner's unique identifier.
     let partnerIdentifier = "verve"
@@ -50,7 +47,6 @@ final class VerveAdapter: PartnerAdapter {
             completion(error)
             return
         }
-        self.appToken = appToken
 
         HyBid.initWithAppToken(appToken) { success in
             if success {
@@ -68,13 +64,14 @@ final class VerveAdapter: PartnerAdapter {
     /// - parameter request: Information about the ad load request.
     /// - parameter completion: Closure to be performed with the fetched info.
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
-        guard let appToken else {
-            let error = error(.prebidFailureInvalidArgument, description: "App token is empty")
+        let signalData = HyBid.getCustomRequestSignalData("cb")
+        guard let signalData else {
+            let error = error(.prebidFailureInvalidArgument, description: "Signal data is empty")
             log(.fetchBidderInfoFailed(request, error: error))
             completion(nil)
             return
         }
-        completion(["app_auth_token": appToken])
+        completion(["signal_data": signalData])
     }
     
     /// Indicates if GDPR applies or not and the user's GDPR consent status.
