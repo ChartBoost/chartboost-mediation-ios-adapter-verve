@@ -14,18 +14,23 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
     /// Should be nil for full-screen ads.
     var inlineView: UIView?
     
+    /// The loaded partner ad banner size.
+    /// Should be `nil` for full-screen ads.
+    var bannerSize: PartnerBannerSize?
+    
     /// Loads an ad.
     /// - parameter viewController: The view controller on which the ad will be presented on. Needed on load for some banners.
     /// - parameter completion: Closure to be performed once the ad has been loaded.
-    func load(with viewController: UIViewController?, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
+    func load(with viewController: UIViewController?, completion: @escaping (Result<PartnerDetails, Error>) -> Void) {
         log(.loadStarted)
 
         // Fail if we cannot fit a fixed size banner in the requested size.
-        guard let (_, partnerSize) = fixedBannerSize(for: request.size ?? IABStandardAdSize) else {
+        guard let (loadedSize, partnerSize) = fixedBannerSize(for: request.size ?? IABStandardAdSize) else {
             let error = error(.loadFailureInvalidBannerSize)
             log(.loadFailed(error))
             return completion(.failure(error))
         }
+        bannerSize = PartnerBannerSize(size: loadedSize, type: .fixed)
 
         guard let ad = HyBidAdView(size: partnerSize) else {
             let error = error(.loadFailureUnknown)
@@ -48,7 +53,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
     /// It will never get called for banner ads. You may leave the implementation blank for that ad format.
     /// - parameter viewController: The view controller on which the ad will be presented on.
     /// - parameter completion: Closure to be performed once the ad has been shown.
-    func show(with viewController: UIViewController, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
+    func show(with viewController: UIViewController, completion: @escaping (Result<PartnerDetails, Error>) -> Void) {
         // no-op
     }
 }
@@ -57,14 +62,7 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
     func adViewDidLoad(_ adView: HyBidAdView!) {
         log(.loadSucceeded)
         self.inlineView = adView
-
-        var partnerDetails: [String: String] = [:]
-        if let loadedSize = fixedBannerSize(for: request.size ?? IABStandardAdSize) {
-            partnerDetails["bannerWidth"] = "\(loadedSize.size.width)"
-            partnerDetails["bannerHeight"] = "\(loadedSize.size.height)"
-            partnerDetails["bannerType"] = "0" // Fixed banner
-        }
-        loadCompletion?(.success(partnerDetails)) ?? log(.loadResultIgnored)
+        loadCompletion?(.success([:])) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
