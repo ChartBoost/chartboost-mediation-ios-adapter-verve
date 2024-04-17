@@ -107,7 +107,7 @@ final class VerveAdapter: PartnerAdapter {
     func makeAd(request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) throws -> PartnerAd {
         // This partner supports multiple loads for the same partner placement.
         switch request.format {
-        case PartnerAdFormats.banner, PartnerAdFormats.adaptiveBanner:
+        case PartnerAdFormats.banner:
             return VerveAdapterBannerAd(adapter: self, request: request, delegate: delegate)
         case PartnerAdFormats.interstitial:
             return VerveAdapterInterstitialAd(adapter: self, request: request, delegate: delegate)
