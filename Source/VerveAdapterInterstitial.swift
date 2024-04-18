@@ -8,15 +8,7 @@ import Foundation
 import HyBid
 
 /// The Chartboost Mediation Verve adapter interstitial ad.
-final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
-    
-    /// The partner ad view to display inline. E.g. a banner view.
-    /// Should be nil for full-screen ads.
-    var inlineView: UIView? { nil }
-
-    /// The loaded partner ad banner size.
-    /// Should be `nil` for full-screen ads.
-    var bannerSize: PartnerBannerSize? { nil }
+final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerFullscreenAd {
 
     /// The Verve ad instance.
     var ad: HyBidInterstitialAd?
