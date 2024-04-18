@@ -48,26 +48,25 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerBannerAd {
 }
 
 extension VerveAdapterBannerAd : HyBidAdViewDelegate {
-    func adViewDidLoad(_ adView: HyBidAdView!) {
+    func adViewDidLoad(_ adView: HyBidAdView?) {
         log(.loadSucceeded)
-        self.inlineView = adView
         loadCompletion?(.success([:])) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
-    func adView(_ adView: HyBidAdView!, didFailWithError error: Error!) {
+    func adView(_ adView: HyBidAdView?, didFailWithError error: Error!) {
         let error = error ?? self.error(.loadFailureUnknown)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
-    func adViewDidTrackClick(_ adView: HyBidAdView!) {
+    func adViewDidTrackClick(_ adView: HyBidAdView?) {
         log(.didClick(error: nil))
         delegate?.didClick(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
-    func adViewDidTrackImpression(_ adView: HyBidAdView!) {
+    func adViewDidTrackImpression(_ adView: HyBidAdView?) {
         log(.didTrackImpression)
         delegate?.didTrackImpression(self, details: [:])  ?? log(.delegateUnavailable)
     }
