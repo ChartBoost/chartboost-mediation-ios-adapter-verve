@@ -25,7 +25,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
         log(.loadStarted)
 
         // Fail if we cannot fit a fixed size banner in the requested size.
-        guard let (loadedSize, partnerSize) = fixedBannerSize(for: request.size ?? IABStandardAdSize) else {
+        guard let (loadedSize, partnerSize) = fixedBannerSize(for: request.bannerSize) else {
             let error = error(.loadFailureInvalidBannerSize)
             log(.loadFailed(error))
             return completion(.failure(error))
@@ -86,7 +86,10 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
 
 // MARK: - Helpers
 extension VerveAdapterBannerAd {
-    private func fixedBannerSize(for requestedSize: CGSize) -> (size: CGSize, partnerSize: HyBidAdSize)? {
+    private func fixedBannerSize(for requestedSize: BannerSize?) -> (size: CGSize, partnerSize: HyBidAdSize)? {
+        guard let requestedSize else {
+            return (IABStandardAdSize, .size_320x50)
+        }
         let sizes: [(size: CGSize, partnerSize: HyBidAdSize)] = [
             (size: IABLeaderboardAdSize, partnerSize: .size_728x90),
             (size: IABMediumAdSize, partnerSize: .size_300x250),
@@ -95,8 +98,8 @@ extension VerveAdapterBannerAd {
         // Find the largest size that can fit in the requested size.
         for (size, partnerSize) in sizes {
             // If height is 0, the pub has requested an ad of any height, so only the width matters.
-            if requestedSize.width >= size.width &&
-                (size.height == 0 || requestedSize.height >= size.height) {
+            if requestedSize.size.width >= size.width &&
+                (size.height == 0 || requestedSize.size.height >= size.height) {
                 return (size, partnerSize)
             }
         }
