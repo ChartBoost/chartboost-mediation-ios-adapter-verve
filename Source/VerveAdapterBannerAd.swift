@@ -8,16 +8,13 @@ import Foundation
 import HyBid
 
 /// The Chartboost Mediation Verve adapter banner ad.
-final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
-    
-    /// The partner ad view to display inline. E.g. a banner view.
-    /// Should be nil for full-screen ads.
-    var inlineView: UIView?
-    
+final class VerveAdapterBannerAd: VerveAdapterAd, PartnerBannerAd {
+    /// The partner banner ad view to display.
+    var view: UIView?
+
     /// The loaded partner ad banner size.
-    /// Should be `nil` for full-screen ads.
-    var bannerSize: PartnerBannerSize?
-    
+    var size: PartnerBannerSize?
+
     /// Loads an ad.
     /// - parameter viewController: The view controller on which the ad will be presented on. Needed on load for some banners.
     /// - parameter completion: Closure to be performed once the ad has been loaded.
@@ -30,7 +27,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
             log(.loadFailed(error))
             return completion(.failure(error))
         }
-        bannerSize = PartnerBannerSize(size: loadedSize, type: .fixed)
+        size = PartnerBannerSize(size: loadedSize, type: .fixed)
 
         guard let ad = HyBidAdView(size: partnerSize) else {
             let error = error(.loadFailureUnknown)
@@ -39,7 +36,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
         }
 
         self.loadCompletion = completion
-        inlineView = ad
+        view = ad
         // Load differently depending on whether this is a bidding or non-programatic ad
         if let adm = request.adm {
             ad.delegate = self
@@ -48,37 +45,28 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerAd {
             ad.load(withZoneID: self.request.partnerPlacement, andWith: self)
         }
     }
-    
-    /// Shows a loaded ad.
-    /// It will never get called for banner ads. You may leave the implementation blank for that ad format.
-    /// - parameter viewController: The view controller on which the ad will be presented on.
-    /// - parameter completion: Closure to be performed once the ad has been shown.
-    func show(with viewController: UIViewController, completion: @escaping (Result<PartnerDetails, Error>) -> Void) {
-        // no-op
-    }
 }
 
 extension VerveAdapterBannerAd : HyBidAdViewDelegate {
-    func adViewDidLoad(_ adView: HyBidAdView!) {
+    func adViewDidLoad(_ adView: HyBidAdView?) {
         log(.loadSucceeded)
-        self.inlineView = adView
         loadCompletion?(.success([:])) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
-    func adView(_ adView: HyBidAdView!, didFailWithError error: Error!) {
+    func adView(_ adView: HyBidAdView?, didFailWithError error: Error!) {
         let error = error ?? self.error(.loadFailureUnknown)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
-    func adViewDidTrackClick(_ adView: HyBidAdView!) {
+    func adViewDidTrackClick(_ adView: HyBidAdView?) {
         log(.didClick(error: nil))
         delegate?.didClick(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
-    func adViewDidTrackImpression(_ adView: HyBidAdView!) {
+    func adViewDidTrackImpression(_ adView: HyBidAdView?) {
         log(.didTrackImpression)
         delegate?.didTrackImpression(self, details: [:])  ?? log(.delegateUnavailable)
     }
