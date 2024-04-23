@@ -70,33 +70,44 @@ final class VerveAdapter: PartnerAdapter {
         completion(.success(signalData.map { ["signal_data": $0] } ?? [:]))
     }
     
-    /// Indicates if GDPR applies or not and the user's GDPR consent status.
-    /// - parameter applies: `true` if GDPR applies, `false` if not, `nil` if the publisher has not provided this information.
-    /// - parameter status: One of the `GDPRConsentStatus` values depending on the user's preference.
-    func setGDPR(applies: Bool?, status: GDPRConsentStatus) {
-        if status == .granted {
-            HyBidUserDataManager.sharedInstance().grantConsent()
-            log(.privacyUpdated(setting: "GDPR", value: "grantConsent"))
-        } else if status == .denied {
-            HyBidUserDataManager.sharedInstance().denyConsent()
-            log(.privacyUpdated(setting: "GDPR", value: "denyConsent"))
+    /// Indicates that the user consent has changed.
+    /// - parameter consents: The new consents value, including both modified and unmodified consents.
+    /// - parameter modifiedKeys: A set containing all the keys that changed.
+    func setConsents(_ consents: [ConsentKey: ConsentValue], modifiedKeys: Set<ConsentKey>) {
+        // GDPR
+        if modifiedKeys.contains(partnerID) || modifiedKeys.contains(ConsentKeys.gdprConsentGiven) {
+            let consent = consents[partnerID] ?? consents[ConsentKeys.gdprConsentGiven]
+            switch consent {
+            case ConsentValues.granted:
+                HyBidUserDataManager.sharedInstance().grantConsent()
+                log(.privacyUpdated(setting: "GDPR", value: "grantConsent"))
+            case ConsentValues.denied:
+                HyBidUserDataManager.sharedInstance().denyConsent()
+                log(.privacyUpdated(setting: "GDPR", value: "denyConsent"))
+            default:
+                break   // do nothing
+            }
+        }
+
+        // TCF
+        if modifiedKeys.contains(ConsentKeys.tcf), let tcfString = consents[ConsentKeys.tcf] {
+            HyBidUserDataManager.sharedInstance().setIABGDPRConsentString(tcfString)
+            log(.privacyUpdated(setting: "IABGDPRConsentString", value: tcfString))
+        }
+
+        // CCPA
+        if modifiedKeys.contains(ConsentKeys.usp), let uspString = consents[ConsentKeys.usp] {
+            HyBidUserDataManager.sharedInstance().setIABUSPrivacyString(uspString)
+            log(.privacyUpdated(setting: "IABUSPrivacyString", value: uspString))
         }
     }
-    
-    /// Indicates the CCPA status both as a boolean and as an IAB US privacy string.
-    /// - parameter hasGivenConsent: A boolean indicating if the user has given consent.
-    /// - parameter privacyString: An IAB-compliant string indicating the CCPA status.
-    func setCCPA(hasGivenConsent: Bool, privacyString: String) {
-        HyBidUserDataManager.sharedInstance().setIABUSPrivacyString(privacyString)
-        log(.privacyUpdated(setting: "IABUSPrivacyString", value: privacyString))
-    }
-    
-    /// Indicates if the user is subject to COPPA or not.
-    /// - parameter isChildDirected: `true` if the user is subject to COPPA, `false` otherwise.
-    func setCOPPA(isChildDirected: Bool) {
+
+    /// Indicates that the user is underage signal has changed.
+    /// - parameter isUserUnderage: `true` if the user is underage as determined by the publisher, `false` otherwise.
+    func setIsUserUnderage(_ isUserUnderage: Bool) {
         // No COPPA methods available on HyBidUserDataManager
     }
-    
+
     /// Creates a new banner ad object in charge of communicating with a single partner SDK ad instance.
     /// Chartboost Mediation SDK calls this method to create a new ad for each new load request. Ad instances are never reused.
     /// Chartboost Mediation SDK takes care of storing and disposing of ad instances so you don't need to.
