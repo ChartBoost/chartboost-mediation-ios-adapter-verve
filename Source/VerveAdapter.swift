@@ -48,6 +48,10 @@ final class VerveAdapter: PartnerAdapter {
             return
         }
 
+        // Apply initial consents
+        setConsents(configuration.consents, modifiedKeys: Set(configuration.consents.keys))
+        setIsUserUnderage(configuration.isUserUnderage)
+
         HyBid.initWithAppToken(appToken) { success in
             if success {
                 self.log(.setUpSucceded)
