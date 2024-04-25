@@ -13,19 +13,27 @@ final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
     /// The version of the partner SDK.
-    let partnerSDKVersion = HyBid.sdkVersion() ?? "Unknown"  // SDK returns an optional string
-    
+    var partnerSDKVersion: String {
+        VerveAdapterConfiguration.partnerSDKVersion
+    }
+
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.2.21.0.0"
-    
+    var adapterVersion: String {
+        VerveAdapterConfiguration.adapterVersion
+    }
+
     /// The partner's unique identifier.
-    let partnerID = "verve"
-    
+    var partnerID: String {
+        VerveAdapterConfiguration.partnerID
+    }
+
     /// The human-friendly partner name.
-    let partnerDisplayName = "Verve"
-    
+    var partnerDisplayName: String {
+        VerveAdapterConfiguration.partnerDisplayName
+    }
+
     /// The designated initializer for the adapter.
     /// Chartboost Mediation SDK will use this constructor to create instances of conforming types.
     /// - parameter storage: An object that exposes storage managed by the Chartboost Mediation SDK to the adapter.
