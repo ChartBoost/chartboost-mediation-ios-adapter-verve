@@ -75,23 +75,27 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
 // MARK: - Helpers
 extension VerveAdapterBannerAd {
     private func fixedBannerSize(for requestedSize: BannerSize?) -> (size: CGSize, partnerSize: HyBidAdSize)? {
+        // Return a default value if no size is specified.
         guard let requestedSize else {
-            return (IABStandardAdSize, .size_320x50)
+            return (BannerSize.standard.size, .size_320x50)
         }
-        let sizes: [(size: CGSize, partnerSize: HyBidAdSize)] = [
-            (size: IABLeaderboardAdSize, partnerSize: .size_728x90),
-            (size: IABMediumAdSize, partnerSize: .size_300x250),
-            (size: IABStandardAdSize, partnerSize: .size_320x50)
-        ]
-        // Find the largest size that can fit in the requested size.
-        for (size, partnerSize) in sizes {
-            // If height is 0, the pub has requested an ad of any height, so only the width matters.
-            if requestedSize.size.width >= size.width &&
-                (size.height == 0 || requestedSize.size.height >= size.height) {
-                return (size, partnerSize)
+        // If we can find a size that fits, return that.
+        if let size = BannerSize.largestStandardFixedSizeThatFits(in: requestedSize) {
+            switch size {
+            case .standard:
+                return (BannerSize.standard.size, .size_320x50)
+            case .medium:
+                return (BannerSize.medium.size, .size_300x250)
+            case .leaderboard:
+                return (BannerSize.leaderboard.size, .size_728x90)
+            default:
+                // largestStandardFixedSizeThatFits currently only returns .standard, .medium, or .leaderboard,
+                // but if that changes then just default to .standard until this code gets updated.
+                return (BannerSize.standard.size, .size_320x50)
             }
+        } else {
+            // largestStandardFixedSizeThatFits has returned nil to indicate it couldn't find a fit.
+            return nil
         }
-        // The requested size cannot fit any fixed size banners.
-        return nil
     }
 }
