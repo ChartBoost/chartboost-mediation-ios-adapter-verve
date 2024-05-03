@@ -12,27 +12,9 @@ import UIKit
 final class VerveAdapter: PartnerAdapter {
     private let APP_TOKEN_KEY: String = "app_token"
 
-    /// The version of the partner SDK.
-    var partnerSDKVersion: String {
-        VerveAdapterConfiguration.partnerSDKVersion
-    }
-
-    /// The version of the adapter.
-    /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
-    /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    var adapterVersion: String {
-        VerveAdapterConfiguration.adapterVersion
-    }
-
-    /// The partner's unique identifier.
-    var partnerID: String {
-        VerveAdapterConfiguration.partnerID
-    }
-
-    /// The human-friendly partner name.
-    var partnerDisplayName: String {
-        VerveAdapterConfiguration.partnerDisplayName
-    }
+    /// The adapter configuration type that contains adapter and partner info.
+    /// It may also be used to expose custom partner SDK options to the publisher.
+    var configuration: PartnerAdapterConfiguration.Type { VerveAdapterConfiguration.self }
 
     /// The designated initializer for the adapter.
     /// Chartboost Mediation SDK will use this constructor to create instances of conforming types.
@@ -87,8 +69,8 @@ final class VerveAdapter: PartnerAdapter {
     /// - parameter modifiedKeys: A set containing all the keys that changed.
     func setConsents(_ consents: [ConsentKey: ConsentValue], modifiedKeys: Set<ConsentKey>) {
         // GDPR
-        if modifiedKeys.contains(partnerID) || modifiedKeys.contains(ConsentKeys.gdprConsentGiven) {
-            let consent = consents[partnerID] ?? consents[ConsentKeys.gdprConsentGiven]
+        if modifiedKeys.contains(configuration.partnerID) || modifiedKeys.contains(ConsentKeys.gdprConsentGiven) {
+            let consent = consents[configuration.partnerID] ?? consents[ConsentKeys.gdprConsentGiven]
             switch consent {
             case ConsentValues.granted:
                 HyBidUserDataManager.sharedInstance().grantConsent()
