@@ -22,14 +22,18 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerBannerAd {
         log(.loadStarted)
 
         // Fail if we cannot fit a fixed size banner in the requested size.
-        guard let (loadedSize, partnerSize) = fixedBannerSize(for: request.bannerSize) else {
+        guard
+            let requestedSize = request.bannerSize,
+            let fittingSize = BannerSize.largestStandardFixedSizeThatFits(in: requestedSize),
+            let verveSize = fittingSize.verveAdSize
+        else {
             let error = error(.loadFailureInvalidBannerSize)
             log(.loadFailed(error))
             return completion(.failure(error))
         }
-        size = PartnerBannerSize(size: loadedSize, type: .fixed)
+        size = PartnerBannerSize(size: fittingSize.size, type: .fixed)
 
-        guard let ad = HyBidAdView(size: partnerSize) else {
+        guard let ad = HyBidAdView(size: verveSize) else {
             let error = error(.loadFailureUnknown)
             log(.loadFailed(error))
             return completion(.failure(error))
@@ -72,26 +76,17 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
     }
 }
 
-// MARK: - Helpers
-extension VerveAdapterBannerAd {
-    private func fixedBannerSize(for requestedSize: BannerSize?) -> (size: CGSize, partnerSize: HyBidAdSize)? {
-        guard let requestedSize else {
-            return (IABStandardAdSize, .size_320x50)
+extension BannerSize {
+    fileprivate var verveAdSize: HyBidAdSize? {
+        switch self {
+        case .standard:
+                .size_320x50
+        case .medium:
+                .size_300x250
+        case .leaderboard:
+                .size_728x90
+        default:
+            nil
         }
-        let sizes: [(size: CGSize, partnerSize: HyBidAdSize)] = [
-            (size: IABLeaderboardAdSize, partnerSize: .size_728x90),
-            (size: IABMediumAdSize, partnerSize: .size_300x250),
-            (size: IABStandardAdSize, partnerSize: .size_320x50)
-        ]
-        // Find the largest size that can fit in the requested size.
-        for (size, partnerSize) in sizes {
-            // If height is 0, the pub has requested an ad of any height, so only the width matters.
-            if requestedSize.size.width >= size.width &&
-                (size.height == 0 || requestedSize.size.height >= size.height) {
-                return (size, partnerSize)
-            }
-        }
-        // The requested size cannot fit any fixed size banners.
-        return nil
     }
 }
