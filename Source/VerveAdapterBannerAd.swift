@@ -22,14 +22,18 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerBannerAd {
         log(.loadStarted)
 
         // Fail if we cannot fit a fixed size banner in the requested size.
-        guard let (loadedSize, partnerSize) = fixedBannerSize(for: request.bannerSize) else {
+        guard
+            let requestedSize = request.bannerSize,
+            let fittingSize = BannerSize.largestStandardFixedSizeThatFits(in: requestedSize),
+            let verveSize = fittingSize.verveAdSize
+        else {
             let error = error(.loadFailureInvalidBannerSize)
             log(.loadFailed(error))
             return completion(.failure(error))
         }
-        size = PartnerBannerSize(size: loadedSize, type: .fixed)
+        size = PartnerBannerSize(size: fittingSize.size, type: .fixed)
 
-        guard let ad = HyBidAdView(size: partnerSize) else {
+        guard let ad = HyBidAdView(size: verveSize) else {
             let error = error(.loadFailureUnknown)
             log(.loadFailed(error))
             return completion(.failure(error))
@@ -72,30 +76,17 @@ extension VerveAdapterBannerAd : HyBidAdViewDelegate {
     }
 }
 
-// MARK: - Helpers
-extension VerveAdapterBannerAd {
-    private func fixedBannerSize(for requestedSize: BannerSize?) -> (size: CGSize, partnerSize: HyBidAdSize)? {
-        // Return a default value if no size is specified.
-        guard let requestedSize else {
-            return (BannerSize.standard.size, .size_320x50)
-        }
-        // If we can find a size that fits, return that.
-        if let size = BannerSize.largestStandardFixedSizeThatFits(in: requestedSize) {
-            switch size {
-            case .standard:
-                return (BannerSize.standard.size, .size_320x50)
-            case .medium:
-                return (BannerSize.medium.size, .size_300x250)
-            case .leaderboard:
-                return (BannerSize.leaderboard.size, .size_728x90)
-            default:
-                // largestStandardFixedSizeThatFits currently only returns .standard, .medium, or .leaderboard,
-                // but if that changes then just default to .standard until this code gets updated.
-                return (BannerSize.standard.size, .size_320x50)
-            }
-        } else {
-            // largestStandardFixedSizeThatFits has returned nil to indicate it couldn't find a fit.
-            return nil
+extension BannerSize {
+    fileprivate var verveAdSize: HyBidAdSize? {
+        switch self {
+        case .standard:
+                .size_320x50
+        case .medium:
+                .size_300x250
+        case .leaderboard:
+                .size_728x90
+        default:
+            nil
         }
     }
 }
