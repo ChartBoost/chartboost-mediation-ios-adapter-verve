@@ -5,6 +5,7 @@ Adapters are compatible with any Chartboost Mediation SDK version within that ma
 
 ### 4.3.0.0.1
 - This version of the adapter has been certified with HyBid 3.0.0.
+- Use 'signal' from bid response instead of the adm string.
 
 ### 4.3.0.0.0
 - The minimum OS version required is now iOS 12.0.
