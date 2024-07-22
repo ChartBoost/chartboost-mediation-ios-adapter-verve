@@ -29,9 +29,10 @@ final class VerveAdapterInterstitialAd: VerveAdapterAd, PartnerAd {
         let hyBidAd = HyBidInterstitialAd(zoneID: request.partnerPlacement, andWith: self)
         // Save a reference to it
         ad = hyBidAd
-        // Load differently depending on whether this is a bidding or non-programatic ad
-        if let adm = request.adm {
-            hyBidAd.prepareAdWithContent(adContent: adm)
+        if let signal = request.partnerSettings["signal"] as? String {
+            DispatchQueue.main.async {
+                hyBidAd.prepareAdWithContent(adContent: signal)
+            }
         } else {
             hyBidAd.load()
         }
