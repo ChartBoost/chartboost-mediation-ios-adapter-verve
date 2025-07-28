@@ -30,6 +30,7 @@ final class VerveAdapterRewardedAd: VerveAdapterAd, PartnerFullscreenAd {
             DispatchQueue.main.async {
                 hyBidAd.prepareAdWithContent(adContent: signal)
             }
+        } else {
             hyBidAd.load()
         }
 
