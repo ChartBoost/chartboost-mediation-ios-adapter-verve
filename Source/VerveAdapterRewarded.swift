@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Chartboost, Inc.
+// Copyright 2023-2025 Chartboost, Inc.
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file.
@@ -57,8 +57,7 @@ final class VerveAdapterRewardedAd: VerveAdapterAd, PartnerFullscreenAd {
     }
 }
 
-extension VerveAdapterRewardedAd: HyBidRewardedAdDelegate
-{
+extension VerveAdapterRewardedAd: HyBidRewardedAdDelegate {
     func rewardedDidLoad() {
         log(.loadSucceeded)
         loadCompletion?(nil) ?? log(.loadResultIgnored)
