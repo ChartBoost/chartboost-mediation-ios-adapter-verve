@@ -34,12 +34,7 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerBannerAd {
         }
         size = PartnerBannerSize(size: fittingSize.size, type: .fixed)
 
-        guard let adView = HyBidAdView(size: verveSize) else {
-            let error = error(.loadFailureUnknown)
-            log(.loadFailed(error))
-            completion(error)
-            return
-        }
+        let adView = HyBidAdView(size: verveSize)
 
         self.loadCompletion = completion
         view = adView
@@ -54,25 +49,24 @@ final class VerveAdapterBannerAd: VerveAdapterAd, PartnerBannerAd {
 }
 
 extension VerveAdapterBannerAd: HyBidAdViewDelegate {
-    func adViewDidLoad(_ adView: HyBidAdView?) {
+    func adViewDidLoad(_ adView: HyBidAdView) {
         log(.loadSucceeded)
         loadCompletion?(nil) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
-    func adView(_ adView: HyBidAdView?, didFailWithError error: Error!) {
-        let error = error ?? self.error(.loadFailureUnknown)
+    func adView(_ adView: HyBidAdView, didFailWithError error: any Error) {
         log(.loadFailed(error))
         loadCompletion?(error) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
 
-    func adViewDidTrackClick(_ adView: HyBidAdView?) {
+    func adViewDidTrackClick(_ adView: HyBidAdView) {
         log(.didClick(error: nil))
         delegate?.didClick(self) ?? log(.delegateUnavailable)
     }
 
-    func adViewDidTrackImpression(_ adView: HyBidAdView?) {
+    func adViewDidTrackImpression(_ adView: HyBidAdView) {
         log(.didTrackImpression)
         delegate?.didTrackImpression(self) ?? log(.delegateUnavailable)
     }
